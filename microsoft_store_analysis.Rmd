@@ -1,0 +1,78 @@
+---
+title: "Microsoft Store Analysis"
+author: "Atharva Ramgirkar"
+date: "8/3/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Load the necessay libraries
+```{r load_library, message=FALSE}
+library(dplyr)
+```
+
+### Download the file form the given URL
+*https://www.kaggle.com/vishnuvarthanrao/windows-store/download"*
+
+### Unzip the file
+```{r unzip_file}
+unzip(zipfile = "761595_1314449_bundle_archive.zip",exdir =".")
+```
+
+### Read the .csv file
+```{r read_data}
+msft_df<-read.csv(file = "msft.csv",
+                  header = TRUE,
+                  sep = ",")
+```
+
+### Dataset before manipulation
+```{r data_overview}
+# First few rows
+head(msft_df)
+
+# General Information of the dataset
+summary(msft_df)
+```
+
+### Copy and Store the original dataset into another variable before manipulation 
+```{r df_copy}
+msft_df_ori<-msft_df
+```
+
+### Data Manipulation and Cleaning
+```{r data_manip}
+# the last record looks waste so we remove it
+msft_df<-msft_df[1:5321,]
+
+# Clearly some columns need modification
+# The price Column must be integer/float
+msft_df<-msft_df %>% mutate(Price=case_when(msft_df$Price=="Free"~"0",TRUE~substring(msft_df$Price,first = 5)))
+
+msft_df$Price<-gsub(",","",msft_df$Price)
+
+msft_df$Price<-as.numeric(msft_df$Price)
+
+# The data column must be date format
+msft_df$Date<-as.Date(msft_df$Date,format = "%d-%m-%Y")
+                      
+# convert the colnames to lower case so they are easy to analyze and we dont
+# mess up the initial capital letter
+colnames(msft_df)<-tolower(colnames(msft_df))
+
+# convert all the character columns to lower case so it is easier to analyze
+msft_df$category<-tolower(msft_df$category)
+msft_df$name<-tolower(msft_df$name)
+```
+
+### Overview of the dataset after manipulation
+```{r data_after_manip}
+# First few rows
+head(msft_df)
+
+# General Information of the dataset
+summary(msft_df)
+```
